@@ -1,2 +1,3 @@
 board
 *.log
+backend/scripts/node_modules

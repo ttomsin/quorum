@@ -25,6 +25,37 @@
         }
         h1 { font-size: 20px; margin: 0 0 4px; }
         .topic { color: var(--muted); margin-bottom: 24px; }
+        .participants {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding: 14px 16px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        .participant-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+        .participant-pill.human { border-color: var(--human); color: var(--human); }
+        .participant-pill.agent { border-color: var(--agent); color: var(--agent); }
+        .participant-pill .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .participant-pill .represents {
+            color: var(--muted);
+            font-size: 10px;
+        }
         .board {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -89,6 +120,8 @@
 <h1 id="topic">Loading board…</h1>
 <div class="topic">Humans and their agents propose, argue, and vote — together.</div>
 
+<div class="participants" id="participants"></div>
+
 <div class="board" id="board"></div>
 
 <div class="controls">
@@ -124,6 +157,20 @@
         document.getElementById('topic').textContent = board.topic;
 
         const byId = Object.fromEntries(board.participants.map(p => [p.id, p]));
+
+        // Participant roster -- shown up front so it's clear who's "in the room",
+        // human or agent, and which agent represents which human.
+        const participantsEl = document.getElementById('participants');
+        participantsEl.innerHTML = board.participants.map(p => {
+            const cls = p.type === 'human' ? 'human' : 'agent';
+            const represents = p.represents_id
+                ? `<span class="represents">→ ${byId[p.represents_id]?.name || p.represents_id}</span>`
+                : '';
+            return `<span class="participant-pill ${cls}">
+      <span class="dot"></span>${p.name}${represents}
+    </span>`;
+        }).join('');
+
         const boardEl = document.getElementById('board');
         boardEl.innerHTML = '';
 
